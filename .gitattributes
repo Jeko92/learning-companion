@@ -1,0 +1,14 @@
+# Normalise line endings to LF in the repository regardless of OS.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.woff binary
+*.woff2 binary
+
+# Generated lockfiles: collapse in diffs, don't count for language stats.
+requirements/*.txt linguist-generated=true -diff

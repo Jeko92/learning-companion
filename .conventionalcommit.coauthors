@@ -1,0 +1,9 @@
+# Co-authored-by trailers for pairing / mob sessions.
+# Paste the relevant line(s) at the END of a commit message, after a blank line:
+#
+#   feat(goals-crud): add status filter to goal list
+#
+#   Co-authored-by: Name <email@example.com>
+#
+# Each teammate adds themselves once (use your GitHub noreply address if you
+# keep your email private: <id>+<username>@users.noreply.github.com):

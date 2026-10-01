@@ -1,0 +1,42 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+# --- Virtual environment ---
+.venv/
+venv/
+
+# --- Secrets / local config ---
+.env
+.env.*
+!.env.example
+
+# --- Django ---
+db.sqlite3
+db.sqlite3-journal
+/media/
+/staticfiles/
+
+# --- Tooling caches & reports ---
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+
+# --- Editors / OS ---
+# Editor project files are personal; shared style lives in .editorconfig + pyproject.toml.
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# --- Claude Code (personal) ---
+.claude/settings.local.json
+# Writes made outside any ticket are logged here by the post-write hook.
+work/untracked/

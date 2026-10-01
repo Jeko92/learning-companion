@@ -1,0 +1,36 @@
+{
+  "types": {
+    "feat": { "description": "A new user-facing feature (views, models, forms, endpoints)" },
+    "fix": { "description": "A bugfix" },
+    "refactor": { "description": "Code change that neither fixes a bug nor adds a feature" },
+    "test": { "description": "Adding or correcting pytest tests, fixtures, or factories" },
+    "docs": { "description": "README, CLAUDE.md, docs/, or workflow artifacts in work/" },
+    "style": { "description": "Formatting only (ruff format, djlint reformat), no logic changes" },
+    "perf": { "description": "Performance improvement (queries, select_related, caching)" },
+    "build": { "description": "Dependencies and packaging: pyproject.toml, requirements/*.txt, Dockerfile" },
+    "ci": { "description": "GitHub Actions workflows and pre-commit hook configuration" },
+    "chore": { "description": "Repository maintenance and tooling that doesn't touch app code" },
+    "revert": { "description": "Reverts a previous commit" }
+  },
+  "scopes": {
+    "<ticket-id>": "Default for workflow commits: the ticket id from work/<ticket-id>/ (e.g. feat(goals-crud): ...)",
+    "config": "Django project package: settings, root urls, asgi/wsgi",
+    "accounts": "Authentication and Profile",
+    "goals": "Goal and LearningSession models, views, templates",
+    "resources": "Resource library attached to goals",
+    "ai": "OpenAI summary and next-steps integration",
+    "dashboard": "Dashboard and reporting aggregations",
+    "templates": "Project-level templates and static assets",
+    "deps": "Dependency changes and lockfile updates",
+    "tooling": "Linters, formatters, type checking, editor config, Makefile",
+    "workflow": "AI factory pipeline: .claude skills, rules, hooks",
+    "docker": "Dockerfile and container setup",
+    "ci": "GitHub Actions workflows"
+  },
+  "footerTypes": {
+    "BREAKING CHANGE": { "description": "Incompatible change (e.g. data migration, removed URL, changed env var)" },
+    "Closes": { "description": "Closes a GitHub issue, e.g. Closes #12" },
+    "Refs": { "description": "References a related issue without closing it" },
+    "Co-authored-by": { "description": "Credits teammates when pairing (see .conventionalcommit.coauthors)" }
+  }
+}

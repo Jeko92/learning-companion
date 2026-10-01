@@ -1,0 +1,110 @@
+# Git hooks shared by the whole team. Installed by `make install`
+# (runs `pre-commit install`). Run manually on everything: `make lint`.
+#
+# Tool versions here must match the pins in pyproject.toml [dev] so the
+# editor, the CLI, and the hooks all format identically.
+minimum_pre_commit_version: "4.0.0"
+default_install_hook_types: [pre-commit, commit-msg, pre-push]
+default_stages: [pre-commit]
+default_language_version:
+  python: python3.13   # must match .python-version
+
+repos:
+  # --- Generic hygiene ------------------------------------------------------
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+        args: [--fix=lf]
+      - id: check-yaml
+      - id: check-toml
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: check-added-large-files
+        args: [--maxkb=500]
+      - id: detect-private-key
+      - id: debug-statements
+      - id: check-executables-have-shebangs
+      - id: no-commit-to-branch
+        args: [--branch, main]
+
+  # --- Python: lint + format ----------------------------------------------------
+  - repo: https://github.com/adamchainz/django-upgrade
+    rev: 1.32.0
+    hooks:
+      - id: django-upgrade
+        args: [--target-version, "5.2"]
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.9
+    hooks:
+      - id: ruff-check
+        args: [--fix]
+      - id: ruff-format
+
+  # --- Django templates ---------------------------------------------------------
+  - repo: https://github.com/djlint/djLint
+    rev: v1.46.4
+    hooks:
+      - id: djlint-reformat-django
+      - id: djlint-django
+
+  # --- Lockfiles stay in sync with pyproject.toml -------------------------------
+  - repo: https://github.com/jazzband/pip-tools
+    rev: v7.6.1
+    hooks:
+      - id: pip-compile
+        name: pip-compile requirements/base.txt
+        args: [--quiet, --strip-extras, --allow-unsafe, --generate-hashes, --output-file=requirements/base.txt, pyproject.toml]
+        files: ^(pyproject\.toml|requirements/base\.txt)$
+      - id: pip-compile
+        name: pip-compile requirements/dev.txt
+        args: [--quiet, --strip-extras, --allow-unsafe, --generate-hashes, --extra=dev, --output-file=requirements/dev.txt, pyproject.toml]
+        files: ^(pyproject\.toml|requirements/dev\.txt)$
+
+  # --- Commit messages: Conventional Commits ------------------------------------
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v4.4.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [commit-msg]
+
+  # --- Project-environment checks (use the project's .venv) ---------------------
+  # POSIX paths (.venv/bin); Windows teammates should work in WSL.
+  - repo: local
+    hooks:
+      - id: python-version
+        name: .venv matches .python-version
+        entry: python3 scripts/check_python_version.py
+        language: system
+        pass_filenames: false
+        always_run: true
+
+      # django-hook.sh skips these until the Django project is scaffolded.
+      - id: mypy
+        name: mypy (django-stubs)
+        entry: scripts/django-hook.sh .venv/bin/mypy .
+        language: system
+        types_or: [python, pyi]
+        pass_filenames: false
+        require_serial: true
+
+      - id: missing-migrations
+        name: no missing Django migrations
+        entry: scripts/django-hook.sh .venv/bin/python manage.py makemigrations --check --dry-run
+        language: system
+        files: (^|/)models(\.py|/.*\.py)$
+        pass_filenames: false
+
+      - id: pytest
+        name: pytest (pre-push)
+        entry: scripts/django-hook.sh .venv/bin/python -m pytest -q
+        language: system
+        types: [python]
+        pass_filenames: false
+        always_run: true
+        stages: [pre-push]

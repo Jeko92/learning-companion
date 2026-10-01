@@ -1,0 +1,171 @@
+# Single source of truth for dependencies and tool configuration.
+#
+# - Dependencies are DECLARED here and LOCKED in requirements/*.txt via
+#   pip-tools (`make lock`). Never edit requirements/*.txt by hand.
+# - Supported Python: >=3.10 (code must run there; ruff/mypy enforce it).
+#   Development Python is pinned in .python-version so the whole team runs
+#   the exact same interpreter.
+
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "learning-companion"
+version = "0.1.0"
+description = "Learning companion: track goals and sessions, attach resources, get AI summaries."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "django>=5.2,<5.3",          # 5.2 LTS (supported until April 2028)
+  "django-environ>=0.12",      # settings & secrets from .env
+]
+
+[project.optional-dependencies]
+dev = [
+  # dependency locking
+  "pip-tools>=7.4",
+  # git hooks
+  "pre-commit>=4.0",
+  # lint + format (keep in sync with the rev in .pre-commit-config.yaml)
+  "ruff==0.16.9",
+  "djlint==1.46.4",
+  # type checking
+  "django-stubs[compatible-mypy]>=5.2,<5.3",
+  # tests
+  "pytest>=8.3",
+  "pytest-django>=4.9",
+  "pytest-cov>=6.0",
+]
+
+[tool.setuptools]
+# This is an application, not an installable package.
+py-modules = []
+
+# --------------------------------------------------------------------------
+# Ruff — linter + formatter (replaces black, isort, flake8, pyupgrade, bandit)
+# --------------------------------------------------------------------------
+[tool.ruff]
+target-version = "py310"   # lowest supported Python
+line-length = 88
+extend-exclude = ["**/migrations/*.py"]
+
+[tool.ruff.lint]
+select = [
+  "F",     # pyflakes
+  "E",     # pycodestyle errors
+  "W",     # pycodestyle warnings
+  "I",     # isort
+  "N",     # pep8-naming
+  "UP",    # pyupgrade (modern syntax for target-version)
+  "B",     # flake8-bugbear
+  "A",     # shadowing builtins
+  "C4",    # comprehensions
+  "DTZ",   # naive datetimes
+  "DJ",    # flake8-django
+  "EM",    # exception messages
+  "ISC",   # implicit string concatenation
+  "PIE",
+  "T20",   # no print()
+  "PT",    # pytest style
+  "RET",   # return statements
+  "SIM",   # simplify
+  "TID",   # tidy imports
+  "ARG",   # unused arguments
+  "PTH",   # pathlib over os.path
+  "ERA",   # commented-out code
+  "PL",    # pylint
+  "S",     # bandit (security)
+  "RUF",
+]
+ignore = [
+  "ISC001",   # conflicts with the formatter
+  "PLR0913",  # too many arguments — Django views/signals often need them
+  "RUF012",   # mutable class attrs — false positives on Django Meta/Admin
+]
+
+[tool.ruff.lint.per-file-ignores]
+"**/tests/**/*.py" = [
+  "S101",     # assert is how pytest works
+  "PLR2004",  # magic values are fine in assertions
+  "ARG001",   # fixtures injected by name
+  "S106",     # hardcoded test passwords
+]
+"**/conftest.py" = ["ARG001"]
+"**/settings*.py" = ["F405", "F403"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["config", "apps"]
+section-order = ["future", "standard-library", "django", "third-party", "first-party", "local-folder"]
+
+[tool.ruff.lint.isort.sections]
+django = ["django"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+docstring-code-format = true
+
+# --------------------------------------------------------------------------
+# djLint — Django template linter + formatter
+# --------------------------------------------------------------------------
+[tool.djlint]
+profile = "django"
+indent = 2
+max_line_length = 120
+format_css = true
+format_js = true
+preserve_blank_lines = true
+ignore = "H006"   # img width/height — not enforced for now
+
+# --------------------------------------------------------------------------
+# mypy + django-stubs
+# --------------------------------------------------------------------------
+[tool.mypy]
+python_version = "3.10"
+plugins = ["mypy_django_plugin.main"]
+strict = true
+warn_unreachable = true
+exclude = ['/migrations/']
+
+[[tool.mypy.overrides]]
+module = ["environ.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["*.tests.*", "tests.*", "conftest"]
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+
+[tool.django-stubs]
+django_settings_module = "config.settings"
+
+# --------------------------------------------------------------------------
+# pytest
+# --------------------------------------------------------------------------
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings"
+python_files = ["test_*.py", "*_test.py", "tests.py"]
+addopts = [
+  "-ra",
+  "--strict-markers",
+  "--strict-config",
+]
+filterwarnings = ["error"]   # warnings are bugs; ignore specific ones explicitly
+
+# --------------------------------------------------------------------------
+# coverage
+# --------------------------------------------------------------------------
+[tool.coverage.run]
+branch = true
+source = ["apps", "config"]
+omit = ["*/migrations/*", "*/tests/*", "config/asgi.py", "config/wsgi.py", "manage.py"]
+
+[tool.coverage.report]
+fail_under = 90
+show_missing = true
+skip_covered = true
+exclude_also = [
+  "if TYPE_CHECKING:",
+  "raise NotImplementedError",
+]
