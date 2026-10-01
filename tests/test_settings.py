@@ -8,6 +8,7 @@ from django.core.exceptions import ImproperlyConfigured
 import pytest
 
 import config.settings
+from config.settings import _env_file_to_read
 
 ENV_KEYS = ("SECRET_KEY", "DEBUG", "ALLOWED_HOSTS", "DATABASE_URL")
 
@@ -107,3 +108,44 @@ def test_relative_env_file_resolves_against_base_dir(
     settings = load_settings(DJANGO_ENV_FILE=".env.example")
 
     assert settings.SECRET_KEY == "change-me"  # noqa: S105 - value from .env.example
+
+
+def test_env_file_unset_uses_default_env_when_present(tmp_path):
+    (tmp_path / ".env").write_text("DEBUG=false\n")
+
+    assert _env_file_to_read(tmp_path, None) == tmp_path / ".env"
+
+
+def test_env_file_unset_skips_missing_default_env(tmp_path):
+    assert _env_file_to_read(tmp_path, None) is None
+
+
+def test_env_file_empty_reads_nothing(tmp_path):
+    (tmp_path / ".env").write_text("DEBUG=false\n")
+
+    assert _env_file_to_read(tmp_path, "") is None
+
+
+def test_env_file_relative_and_absolute_paths(tmp_path):
+    (tmp_path / "custom.env").write_text("")
+    elsewhere = tmp_path / "elsewhere"
+    elsewhere.mkdir()
+
+    assert _env_file_to_read(tmp_path, "custom.env") == tmp_path / "custom.env"
+    assert _env_file_to_read(elsewhere, str(tmp_path / "custom.env")) == (
+        tmp_path / "custom.env"
+    )
+
+
+def test_env_file_expands_home_directory(tmp_path, monkeypatch):
+    monkeypatch.setenv("HOME", str(tmp_path))
+    (tmp_path / "home.env").write_text("")
+
+    assert _env_file_to_read(tmp_path / "project", "~/home.env") == (
+        tmp_path / "home.env"
+    )
+
+
+def test_env_file_explicit_missing_fails_fast(tmp_path):
+    with pytest.raises(ImproperlyConfigured, match="missing file"):
+        _env_file_to_read(tmp_path, "nope.env")

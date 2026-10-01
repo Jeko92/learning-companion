@@ -22,19 +22,28 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = environ.Env()
 
-# DJANGO_ENV_FILE picks the dotenv file (relative paths: from BASE_DIR); empty
-# means "read none" (used by tests). An explicitly named file must exist, the
-# default .env is optional. Real environment variables win over the file.
-_explicit_env_file = os.environ.get("DJANGO_ENV_FILE")
-if _explicit_env_file is None:
-    _default_env_file = BASE_DIR / ".env"
-    if _default_env_file.is_file():
-        env.read_env(_default_env_file)
-elif _explicit_env_file:
-    _env_file = BASE_DIR / _explicit_env_file
-    if not _env_file.is_file():
-        msg = f"DJANGO_ENV_FILE points to a missing file: {_env_file}"
+
+def _env_file_to_read(base_dir: Path, value: str | None) -> Path | None:
+    """Pick the dotenv file to load, given the DJANGO_ENV_FILE value.
+
+    Unset: base_dir/.env if it exists. Empty: none (used by tests). Otherwise
+    the named file (relative paths: from base_dir), which must exist.
+    """
+    if value is None:
+        default = base_dir / ".env"
+        return default if default.is_file() else None
+    if not value:
+        return None
+    path = base_dir / Path(value).expanduser()
+    if not path.is_file():
+        msg = f"DJANGO_ENV_FILE points to a missing file: {path}"
         raise ImproperlyConfigured(msg)
+    return path
+
+
+# Real environment variables win over values from the file.
+_env_file = _env_file_to_read(BASE_DIR, os.environ.get("DJANGO_ENV_FILE"))
+if _env_file is not None:
     env.read_env(_env_file)
 
 SECRET_KEY = env.str("SECRET_KEY")
