@@ -10,7 +10,7 @@ TDD → review) is defined in `.claude/rules/` and enforced by `.claude/hooks/`.
   compatible with **Python 3.10+**: ruff targets `py310`, mypy checks against 3.10.
   Don't use 3.11+ only syntax or stdlib (e.g. `tomllib`, `typing.Self`, `ExceptionGroup`)
   without a fallback.
-- **Node.js + npm** are required for the Tailwind CSS build (django-tailwind,
+- **Node.js >= 20 + npm** are required for the Tailwind CSS build (django-tailwind,
   npm-backed). The built CSS is gitignored: run `make css` after cloning.
 - Always use the project venv: `.venv/bin/python`, `.venv/bin/...`. Never install
   packages with bare `pip install`. Edit `pyproject.toml`, then `make lock && make sync`.

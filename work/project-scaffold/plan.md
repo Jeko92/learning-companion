@@ -71,4 +71,6 @@
 - [x] 13. Subprocess-based tests time out instead of hanging. — test: `tests/test_project.py`, `tests/test_repo.py` (add `timeout=60` to each `subprocess.run`) — impl: none — covers: AC1, AC9, AC10 (robustness)
 - [x] 14. An explicitly set `DJANGO_ENV_FILE` that doesn't exist raises `ImproperlyConfigured`, and relative paths resolve against `BASE_DIR`; a missing default `.env` is still skipped. — test: `tests/test_settings.py` — impl: `config/settings.py`
 - [x] 15. Refactor only: remove the unneeded `django_db` mark in `apps/core/tests/test_views.py`, and move `MAKE` next to `GIT` in `tests/test_repo.py`. — commit `refactor(project-scaffold): ...`
-- [ ] 16. Docs: CLAUDE.md states Node.js >= 20; this plan records that the step-10 djlint exclude was dropped because djLint's defaults already exclude `node_modules`. — no test (docs)
+- [x] 16. Docs: CLAUDE.md states Node.js >= 20; this plan records that the step-10 djlint exclude was dropped because djLint's defaults already exclude `node_modules`. — no test (docs)
+
+Note (step 16): the djlint `node_modules` exclude planned in step 10 was dropped on purpose. djLint excludes `node_modules` by default (verified: `djlint . --lint` only lints the 2 project templates with `node_modules` present), and pre-commit only passes tracked files.
