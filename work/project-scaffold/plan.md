@@ -65,3 +65,10 @@
 | AC9 | 9 |
 | AC10 | 10 (the CLAUDE.md part is checked in review) |
 | AC11 | 11 |
+
+## Review findings (round 1, see review.md)
+- [ ] 12. The AC3 test proves the content: `<h1>Learning Companion</h1>` (html=True) and a tagline element with non-empty text. — test: `apps/core/tests/test_views.py` (tighten the existing test; it must fail when the tagline text is empty, so check that by emptying it temporarily) — impl: none expected — covers: AC3
+- [ ] 13. Subprocess-based tests time out instead of hanging. — test: `tests/test_project.py`, `tests/test_repo.py` (add `timeout=60` to each `subprocess.run`) — impl: none — covers: AC1, AC9, AC10 (robustness)
+- [ ] 14. An explicitly set `DJANGO_ENV_FILE` that doesn't exist raises `ImproperlyConfigured`, and relative paths resolve against `BASE_DIR`; a missing default `.env` is still skipped. — test: `tests/test_settings.py` — impl: `config/settings.py`
+- [ ] 15. Refactor only: remove the unneeded `django_db` mark in `apps/core/tests/test_views.py`, and move `MAKE` next to `GIT` in `tests/test_repo.py`. — commit `refactor(project-scaffold): ...`
+- [ ] 16. Docs: CLAUDE.md states Node.js >= 20; this plan records that the step-10 djlint exclude was dropped because djLint's defaults already exclude `node_modules`. — no test (docs)
