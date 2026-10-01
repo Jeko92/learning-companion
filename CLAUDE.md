@@ -59,9 +59,11 @@ These directories are what `.claude/hooks/config.sh` (`SOURCE_DIRS`) treats as
 source code (write-protected outside the `implementing` phase). Update it if the
 layout changes. `DJANGO_SETTINGS_MODULE` is `config.settings` (pyproject.toml).
 
-Settings come from the environment via `django-environ`. `.env` is read unless
-`DJANGO_ENV_FILE` points elsewhere (empty = no file; the test run uses this).
-`SECRET_KEY` is required; `DEBUG` defaults to False.
+Settings come from the environment via `django-environ`. `.env` is read if it
+exists, unless `DJANGO_ENV_FILE` points elsewhere: relative paths resolve
+against the project root, `~` is expanded, and a named file that doesn't exist
+is an error (empty = read no file; the test run uses this). Real environment
+variables win over the file. `SECRET_KEY` is required; `DEBUG` defaults to False.
 
 ## Conventions
 
