@@ -42,4 +42,14 @@ def test_settings_come_from_environment(load_settings):
     assert settings.SECRET_KEY == "from-env"  # noqa: S105 - test value, not a secret
     assert settings.DEBUG is True
     assert settings.ALLOWED_HOSTS == ["example.com", "www.example.com"]
-    assert settings.DATABASES["default"]["NAME"] == "/tmp/other.sqlite3"  # noqa: S108
+    assert settings.DATABASES["default"]["NAME"] == "/tmp/other.sqlite3"  # noqa: S108 - path string only, nothing is written
+
+
+def test_settings_defaults_when_unset(load_settings):
+    settings = load_settings(SECRET_KEY="only-this-is-required")
+
+    assert settings.DEBUG is False
+    assert settings.ALLOWED_HOSTS == []
+    database = settings.DATABASES["default"]
+    assert database["ENGINE"] == "django.db.backends.sqlite3"
+    assert database["NAME"] == str(settings.BASE_DIR / "db.sqlite3")

@@ -44,7 +44,7 @@
 - [x] 3. The home page shows the heading "Learning Companion" and a tagline. — test: `apps/core/tests/test_views.py` — impl: `core/home.html`, and a nav block placeholder in `base.html` — covers: AC3
 - [x] 4. Missing `SECRET_KEY` raises `ImproperlyConfigured`. — test: `tests/test_settings.py` (reload with `SECRET_KEY` removed) — impl: `config/settings.py` if needed — covers: AC5
 - [x] 5. `DEBUG`, `ALLOWED_HOSTS` (comma-separated) and `DATABASE_URL` from the environment change the settings. — test: `tests/test_settings.py` — impl: `config/settings.py` — covers: AC6
-- [ ] 6. Defaults: `DEBUG` False, `ALLOWED_HOSTS` empty, and SQLite when `DATABASE_URL` is unset. — test: `tests/test_settings.py` — impl: `config/settings.py` — covers: AC7
+- [x] 6. Defaults: `DEBUG` False, `ALLOWED_HOSTS` empty, and SQLite when `DATABASE_URL` is unset. — test: `tests/test_settings.py` — impl: `config/settings.py` — covers: AC7
 - [ ] 7. `tailwind` and `apps.theme` are installed, with `TAILWIND_APP_NAME == "apps.theme"`. — test: `tests/test_settings.py` — impl: `apps/theme/{__init__,apps}.py`, `apps/theme/static_src/{package.json,postcss.config.js,src/styles.css}` (copied from django-tailwind 4.2.0's v4 template, `@source` covering `templates/` and `apps/`), and the settings — covers: AC8
 - [ ] 8. `base.html` loads Tailwind, so the rendered home page links to `/static/css/dist/styles.css`. — test: `apps/core/tests/test_views.py` — impl: `templates/base.html` (`{% load tailwind_tags %}{% tailwind_css %}`) — covers: AC4
 - [ ] 9. Built CSS and `node_modules/` are gitignored. — test: `tests/test_repo.py` (`git check-ignore` on `apps/theme/static/css/dist/styles.css` and `apps/theme/static_src/node_modules/x`) — impl: `.gitignore` — covers: AC9
