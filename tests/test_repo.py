@@ -25,3 +25,27 @@ def test_build_artifacts_are_gitignored(path):
     )
 
     assert result.returncode == 0, f"{path} is not gitignored"
+
+
+MAKE = shutil.which("make") or "make"
+
+
+@pytest.mark.parametrize(
+    ("target", "command"),
+    [
+        ("css", "manage.py tailwind install"),
+        ("css-watch", "manage.py tailwind start"),
+    ],
+)
+def test_make_targets_build_tailwind_css(target, command):
+    # Dry run only (-n): prints the recipe without executing it.
+    result = subprocess.run(  # noqa: S603
+        [MAKE, "-n", target],
+        cwd=BASE_DIR,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stderr
+    assert command in result.stdout

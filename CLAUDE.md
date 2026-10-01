@@ -10,6 +10,8 @@ TDD → review) is defined in `.claude/rules/` and enforced by `.claude/hooks/`.
   compatible with **Python 3.10+**: ruff targets `py310`, mypy checks against 3.10.
   Don't use 3.11+ only syntax or stdlib (e.g. `tomllib`, `typing.Self`, `ExceptionGroup`)
   without a fallback.
+- **Node.js + npm** are required for the Tailwind CSS build (django-tailwind,
+  npm-backed). The built CSS is gitignored: run `make css` after cloning.
 - Always use the project venv: `.venv/bin/python`, `.venv/bin/...`. Never install
   packages with bare `pip install`. Edit `pyproject.toml`, then `make lock && make sync`.
 
@@ -26,24 +28,40 @@ make test        # pytest
 make coverage    # pytest --cov, fail_under = 90
 make check       # lint + typecheck + test
 make doctor      # verify env matches team setup
+make css         # npm install + build Tailwind CSS (apps/theme)
+make css-watch   # rebuild Tailwind CSS on template changes
+```
+
+Dev server (first time: `cp .env.example .env`, then `make css`):
+
+```
+.venv/bin/python manage.py migrate
+make css-watch                          # terminal 1
+.venv/bin/python manage.py runserver    # terminal 2 -> http://127.0.0.1:8000/
 ```
 
 Single test: `.venv/bin/python -m pytest apps/<app>/tests/test_x.py::test_name`.
 
-## Layout (planned, created by the scaffolding ticket)
+## Layout
 
 ```
 config/              Django project package (settings, urls, asgi/wsgi)
-apps/<app>/          Django apps; tests live in apps/<app>/tests/
-templates/           project-level templates
-static/              project-level static files
-tests/               cross-app / integration tests
+apps/<app>/          Django apps (`apps.<app>`); tests live in apps/<app>/tests/
+apps/core/           site-wide pages (home)
+apps/theme/          Tailwind: static_src/ (npm project), static/css/dist/ (built, gitignored)
+templates/           project-level templates (base.html)
+static/              project-level static files (not created yet)
+tests/               cross-app / integration tests (settings, repo setup)
 manage.py
 ```
 
 These directories are what `.claude/hooks/config.sh` (`SOURCE_DIRS`) treats as
 source code (write-protected outside the `implementing` phase). Update it if the
 layout changes. `DJANGO_SETTINGS_MODULE` is `config.settings` (pyproject.toml).
+
+Settings come from the environment via `django-environ`. `.env` is read unless
+`DJANGO_ENV_FILE` points elsewhere (empty = no file; the test run uses this).
+`SECRET_KEY` is required; `DEBUG` defaults to False.
 
 ## Conventions
 
