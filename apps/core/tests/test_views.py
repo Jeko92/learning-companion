@@ -1,3 +1,5 @@
+import re
+
 import pytest
 from pytest_django.asserts import assertContains, assertTemplateUsed
 
@@ -14,9 +16,14 @@ def test_home_page_renders_base_and_home_templates(client):
 def test_home_page_shows_title_and_tagline(client):
     response = client.get("/")
 
-    assertContains(response, "<h1", html=False)
-    assertContains(response, "Learning Companion</h1>", html=False)
-    assertContains(response, 'data-testid="tagline"', html=False)
+    assertContains(response, "<h1>Learning Companion</h1>", html=True)
+    tagline = re.search(
+        r'<p data-testid="tagline">(?P<text>[^<]*)</p>', response.content.decode()
+    )
+    assert tagline is not None, "tagline element missing"
+    text = tagline["text"].strip()
+    assert text, "tagline is empty"
+    assert "\n" not in text, "tagline must be one line"
 
 
 def test_base_layout_links_tailwind_stylesheet(client):
