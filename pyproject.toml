@@ -19,6 +19,7 @@ requires-python = ">=3.10"
 dependencies = [
   "django>=5.2,<5.3",          # 5.2 LTS (supported until April 2028)
   "django-environ>=0.12",      # settings & secrets from .env
+  "django-tailwind>=4.2,<4.3", # Tailwind CSS (npm); 4.3+ drops Python 3.10
 ]
 
 [project.optional-dependencies]
@@ -36,6 +37,7 @@ dev = [
   "pytest>=8.3",
   "pytest-django>=4.9",
   "pytest-cov>=6.0",
+  "pytest-env>=1.1",           # test-only env vars, set before Django loads
 ]
 
 [tool.setuptools]
@@ -152,6 +154,11 @@ addopts = [
   "--strict-config",
 ]
 filterwarnings = ["error"]   # warnings are bugs; ignore specific ones explicitly
+# Tests never read a developer's .env; settings get what they need from here.
+env = [
+  "SECRET_KEY=insecure-test-key",
+  "DJANGO_ENV_FILE=",
+]
 
 # --------------------------------------------------------------------------
 # coverage

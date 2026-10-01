@@ -40,3 +40,10 @@ coverage.xml
 .claude/settings.local.json
 # Writes made outside any ticket are logged here by the post-write hook.
 work/untracked/
+
+# Tailwind (django-tailwind): npm deps and built CSS, rebuilt with `make css`
+node_modules/
+apps/theme/static/css/dist/
+
+# Per-machine workflow state (phase, ticket, last test run)
+.claude/state/

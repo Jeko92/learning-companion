@@ -20,7 +20,7 @@ Install Python 3.13, e.g. `brew install python@3.13`, `pyenv install 3.13`
 ## Setup
 
 ```bash
-git clone git@github.com:Jeko92/ticket-shop.git && cd ticket-shop
+git clone git@github.com:Jeko92/learning-companion.git && cd learning-companion
 make install        # creates .venv with Python 3.13, installs locked deps, installs git hooks
 cp .env.example .env
 make doctor         # verifies your environment matches the team's

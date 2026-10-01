@@ -15,7 +15,7 @@ PROJECT_MARKER="manage.py"
 RUN_TESTS_ON_WRITE="true"
 
 # Branches that may never receive direct commits or force-pushes.
-PROTECTED_BRANCHES="main|master"
+PROTECTED_BRANCHES="main|master|develop"
 
 # Directories that count as production/test code (used by the write guard).
 # Django layout: config/ = project package, apps/ = Django apps,
