@@ -28,6 +28,7 @@ def test_manage_check_passes_with_env_example():
         capture_output=True,
         text=True,
         check=False,
+        timeout=60,
     )
 
     assert result.returncode == 0, result.stderr

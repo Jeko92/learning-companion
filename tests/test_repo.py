@@ -22,6 +22,7 @@ def test_build_artifacts_are_gitignored(path):
         [GIT, "check-ignore", "--quiet", "--no-index", path],
         cwd=BASE_DIR,
         check=False,
+        timeout=60,
     )
 
     assert result.returncode == 0, f"{path} is not gitignored"
@@ -45,6 +46,7 @@ def test_make_targets_build_tailwind_css(target, command):
         capture_output=True,
         text=True,
         check=False,
+        timeout=60,
     )
 
     assert result.returncode == 0, result.stderr
