@@ -40,8 +40,13 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "tailwind",
     "apps.core",
+    "apps.theme",
 ]
+
+# django-tailwind: the app holding static_src/ (npm project) and the built CSS.
+TAILWIND_APP_NAME = "apps.theme"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

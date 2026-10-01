@@ -53,3 +53,9 @@ def test_settings_defaults_when_unset(load_settings):
     database = settings.DATABASES["default"]
     assert database["ENGINE"] == "django.db.backends.sqlite3"
     assert database["NAME"] == str(settings.BASE_DIR / "db.sqlite3")
+
+
+def test_tailwind_and_theme_app_installed(settings):
+    assert "tailwind" in settings.INSTALLED_APPS
+    assert "apps.theme" in settings.INSTALLED_APPS
+    assert settings.TAILWIND_APP_NAME == "apps.theme"

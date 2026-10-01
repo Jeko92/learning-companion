@@ -1,0 +1,8 @@
+@import "tailwindcss";
+
+/*
+ * Files scanned for Tailwind classes: every app (templates, Python, JS) and the
+ * project-level templates/. Paths are relative to this file.
+ */
+@source "../../../**/*.{html,py,js}";
+@source "../../../../templates/**/*.html";
