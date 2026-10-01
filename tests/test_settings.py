@@ -1,4 +1,7 @@
 import importlib
+import os
+from collections.abc import Iterator
+from contextlib import contextmanager
 
 from django.core.exceptions import ImproperlyConfigured
 
@@ -7,6 +10,20 @@ import pytest
 import config.settings
 
 ENV_KEYS = ("SECRET_KEY", "DEBUG", "ALLOWED_HOSTS", "DATABASE_URL")
+
+
+@contextmanager
+def isolated_environ() -> Iterator[None]:
+    """Undo every os.environ change made inside the block.
+
+    monkeypatch alone can't: env.read_env() sets keys monkeypatch never saw.
+    """
+    saved = dict(os.environ)
+    try:
+        yield
+    finally:
+        os.environ.clear()
+        os.environ.update(saved)
 
 
 @pytest.fixture
@@ -21,9 +38,25 @@ def load_settings(monkeypatch):
             monkeypatch.setenv(key, value)
         return importlib.reload(config.settings)
 
-    yield _load
-    monkeypatch.undo()
+    with isolated_environ():
+        yield _load
+        monkeypatch.undo()
     importlib.reload(config.settings)
+
+
+def test_isolated_environ_removes_values_read_from_env_file(monkeypatch):
+    before = dict(os.environ)
+
+    with isolated_environ():
+        for key in ENV_KEYS:
+            monkeypatch.delenv(key, raising=False)
+        monkeypatch.setenv("DJANGO_ENV_FILE", ".env.example")
+        importlib.reload(config.settings)  # read_env adds DEBUG etc. to os.environ
+        monkeypatch.undo()
+
+    after = dict(os.environ)
+    importlib.reload(config.settings)
+    assert after == before
 
 
 def test_missing_secret_key_fails_fast(load_settings):
