@@ -11,7 +11,7 @@ Read `.claude/state/workflow.json`. The phase must be `reviewing`. All plan step
 
 ## Steps
 
-1. Collect the diff under review: `git diff main...HEAD` (paths only in the main context; the reviewers read the contents themselves).
+1. Collect the diff under review: `git diff develop...HEAD` (paths only in the main context; the reviewers read the contents themselves).
 2. **Verification fan-out.** Spawn both reviewers in parallel, each with its own lens and a clean context:
    - `code-reviewer` agent: correctness, plan conformance, test quality of the changed files.
    - `security-reviewer` agent: OWASP Top 10, authn/authz, secrets in the changed files.
@@ -50,7 +50,7 @@ Tell the user to rerun `tdd-implement` for the new steps. Do not fix findings in
 bash .claude/hooks/set-state.sh phase done
 git add work/<id> && git commit -m "docs(<id>): review passed"
 git push -u origin feat/<id>
-gh pr create --base main --title "feat(<id>): <title>" --body "<story, acceptance criteria, reference to work/<id>/review.md>"
+gh pr create --base develop --head feat/<id> --title "feat(<id>): <title>" --body "<story, acceptance criteria, reference to work/<id>/review.md, 'Refs #<issue>' if the ticket came from a GitHub issue>"
 ```
 
-Report the PR URL to the user. The push gate only opens in phase `done`, so a push that gets blocked means the state transition did not happen — check, don't force.
+Report the PR URL to the user. Do not merge it: teammates review and squash-merge ticket PRs into `develop` (see `docs/gitflow.md`). Use `Refs #<issue>`, not `Closes`: the default branch is `main`, so the issue is closed by the release PR. The push gate only opens in phase `done`, so a push that gets blocked means the state transition did not happen — check, don't force.
