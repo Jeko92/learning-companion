@@ -9,7 +9,7 @@ Orchestrates the pipeline defined in `.claude/rules/workflow.md` and the branchi
 
 ## Where tickets come from
 
-The queue is the GitHub Projects (v2) board **"Learning Companion"**, owned by the owner of the `origin` repo (currently project `5` of `Jeko92`, repo `Jeko92/ticket-shop`). The board order of the `Todo` column is the priority order. Each item is an issue whose body has `## Goal`, `## Scope`, `## Draft acceptance criteria`, `## Out of scope`, `## Depends on` (`#N` references, or `–` for none) and a footer `Suggested ticket id: \`<id>\``.
+The queue is the GitHub Projects (v2) board **"Learning Companion"**, owned by the owner of the `origin` repo (currently project `5` of `Jeko92`, repo `Jeko92/learning-companion`). The board order of the `Todo` column is the priority order. Each item is an issue whose body has `## Goal`, `## Scope`, `## Draft acceptance criteria`, `## Out of scope`, `## Depends on` (`#N` references, or `–` for none) and a footer `Suggested ticket id: \`<id>\``.
 
 The board's `Status` field is the **shared** state across teammates' machines: `Todo` → `In Progress` (picked up by someone) → `Done` (released to `main`). Never pick up an item that isn't `Todo`; another teammate may be working on it.
 

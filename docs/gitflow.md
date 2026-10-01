@@ -116,8 +116,8 @@ Local discipline is not enough; GitHub enforces the rules via repository setting
 
 | Ruleset    | Targets                     | Rules                                                                                     | Bypass        |
 |------------|-----------------------------|-------------------------------------------------------------------------------------------|---------------|
-| `main`     | `main`                      | block deletion, block force-push, require PR (squash only), require check `source-branch` | none          |
-| `develop`  | `develop`                   | block deletion, block force-push, require PR (squash + merge), require check `source-branch` | none       |
+| `main`     | `main`                      | block deletion, block force-push, require PR with 1 approving review (squash only), require check `source-branch` | none          |
+| `develop`  | `develop`                   | block deletion, block force-push, require PR with 1 approving review (squash + merge), require check `source-branch` | none       |
 | `tickets`  | `feat/**`, `fix/**`         | block deletion, block force-push                                                          | repo admins (for approved deletions) |
 
 The `source-branch` check (GitHub Action `.github/workflows/pr-source-branch.yml`) fails a PR whose head is not allowed for its base:
@@ -129,7 +129,7 @@ The `source-branch` check (GitHub Action `.github/workflows/pr-source-branch.yml
 
 GitHub can't restrict the merge method per source branch, so `develop` allows both squash and merge commit. The convention is strict: **ticket PRs squash, the back-sync PR merges**.
 
-Rulesets on **private** repositories require GitHub Pro/Team; on the free plan they only work on public repositories. `required_approving_review_count` is `0` for a solo project — raise it when the team grows.
+Rulesets on **private** repositories require GitHub Pro/Team; on the free plan they only work on public repositories. Every PR into `main` and `develop` needs an approving review from a teammate other than the author, for everyone (no bypass, admins included). Stale approvals are dismissed on push, and the last pusher can't approve. The `source-branch` check only becomes required once `.github/workflows/pr-source-branch.yml` exists; until then, requiring it would block every merge.
 
 ## One-time setup script
 
@@ -210,7 +210,7 @@ ruleset <<'JSON'
     { "type": "deletion" },
     { "type": "non_fast_forward" },
     { "type": "pull_request", "parameters": {
-        "required_approving_review_count": 0,
+        "required_approving_review_count": 1,
         "dismiss_stale_reviews_on_push": false,
         "require_code_owner_review": false,
         "require_last_push_approval": false,
@@ -233,7 +233,7 @@ ruleset <<'JSON'
     { "type": "deletion" },
     { "type": "non_fast_forward" },
     { "type": "pull_request", "parameters": {
-        "required_approving_review_count": 0,
+        "required_approving_review_count": 1,
         "dismiss_stale_reviews_on_push": false,
         "require_code_owner_review": false,
         "require_last_push_approval": false,
