@@ -1,0 +1,22 @@
+{% load tailwind_tags %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Learning Companion{% endblock title %}</title>
+    {% tailwind_css %}
+  </head>
+  <body>
+    <header>
+      <nav>
+        {% block nav %}
+        {% endblock nav %}
+      </nav>
+    </header>
+    <main>
+      {% block content %}
+      {% endblock content %}
+    </main>
+  </body>
+</html>

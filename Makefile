@@ -8,7 +8,7 @@ BIN    := $(VENV)/bin
 COMPILE := $(BIN)/pip-compile --quiet --strip-extras --allow-unsafe --generate-hashes
 
 .DEFAULT_GOAL := help
-.PHONY: help install sync lock upgrade doctor lint format typecheck test coverage check clean
+.PHONY: help install sync lock upgrade doctor css css-watch lint format typecheck test coverage check clean
 
 help: ## Show this help
 	@grep -E '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*## "}; {printf "  \033[36m%-10s\033[0m %s\n", $$1, $$2}'
@@ -41,6 +41,12 @@ doctor: ## Verify the local environment matches the team setup
 		&& echo "✓ .venv matches requirements/dev.txt" \
 		|| { echo "✗ .venv out of sync — run: make sync"; exit 1; }
 	@test -f .git/hooks/pre-commit && echo "✓ git hooks installed" || { echo "✗ git hooks missing — run: make install"; exit 1; }
+
+css: ## Install npm deps and build Tailwind CSS (needs Node.js/npm)
+	$(BIN)/python manage.py tailwind install
+
+css-watch: ## Rebuild Tailwind CSS on template changes (run next to runserver)
+	$(BIN)/python manage.py tailwind start
 
 lint: ## Run every pre-commit check on all files
 	$(BIN)/pre-commit run --all-files
