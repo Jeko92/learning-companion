@@ -29,3 +29,17 @@ def load_settings(monkeypatch):
 def test_missing_secret_key_fails_fast(load_settings):
     with pytest.raises(ImproperlyConfigured, match="SECRET_KEY"):
         load_settings()
+
+
+def test_settings_come_from_environment(load_settings):
+    settings = load_settings(
+        SECRET_KEY="from-env",
+        DEBUG="true",
+        ALLOWED_HOSTS="example.com,www.example.com",
+        DATABASE_URL="sqlite:////tmp/other.sqlite3",
+    )
+
+    assert settings.SECRET_KEY == "from-env"  # noqa: S105 - test value, not a secret
+    assert settings.DEBUG is True
+    assert settings.ALLOWED_HOSTS == ["example.com", "www.example.com"]
+    assert settings.DATABASES["default"]["NAME"] == "/tmp/other.sqlite3"  # noqa: S108
