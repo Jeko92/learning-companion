@@ -1,1 +1,3 @@
 2026-10-01T11:58:26+02:00 WRITE work/project-scaffold/plan.md
+2026-10-01T12:30:58+02:00 WRITE apps/core/tests/test_views.py
+2026-10-01T12:30:58+02:00 TESTS green (after apps/core/tests/test_views.py)

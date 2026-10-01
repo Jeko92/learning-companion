@@ -1,5 +1,5 @@
 # Review: project-scaffold
-## Verdict: FAIL (round 2)
+## Verdict: PASS (round 3; rounds 1 and 2 failed, see below)
 
 Reason: AC3 is not actually proven. Its test only checks that the `data-testid="tagline"` attribute exists, so an empty or deleted tagline would still pass (code-reviewer, medium). No high-severity findings. The suite is green (13 passed), lint and mypy are clean, and coverage is 95.6 %.
 
@@ -59,3 +59,33 @@ Security re-review: 0 high, 0 medium, 0 new low. The round-1 security lows remai
 
 ## Reviewed
 commit aa0e545, 2026-10-01
+
+---
+
+# Round 3
+## Verdict: PASS
+
+Suite green (22 passed), lint, mypy and ruff format clean, coverage 100 %. Code review: 0 high, 0 medium, 2 low. Security review: 0 high, 0 medium, 0 new low.
+
+Round 2 findings: all resolved (steps 17–20). The code-reviewer re-ran the env-leak probe in-process and per test: DEBUG, ALLOWED_HOSTS and DATABASE_URL stay unset after every test.
+
+## Acceptance criteria
+- AC1 — `tests/test_project.py::test_manage_check_passes_with_env_example` — PASS
+- AC2 — `apps/core/tests/test_views.py::test_home_page_renders_base_and_home_templates` — PASS
+- AC3 — `apps/core/tests/test_views.py::test_home_page_shows_title_and_tagline` (element text via HTML parser) — PASS
+- AC4 — `apps/core/tests/test_views.py::test_base_layout_links_tailwind_stylesheet` — PASS
+- AC5 — `tests/test_settings.py::test_missing_secret_key_fails_fast` — PASS
+- AC6 — `tests/test_settings.py::test_settings_come_from_environment` — PASS
+- AC7 — `tests/test_settings.py::test_settings_defaults_when_unset` — PASS
+- AC8 — `tests/test_settings.py::test_tailwind_and_theme_app_installed` — PASS
+- AC9 — `tests/test_repo.py::test_build_artifacts_are_gitignored` (3 cases) — PASS
+- AC10 — `tests/test_repo.py::test_make_targets_build_tailwind_css` (2 cases); CLAUDE.md reviewed and accurate — PASS
+- AC11 — `make lint`, `mypy`, pytest (22 passed), coverage 100 % — PASS
+
+## Findings (follow-ups, not blocking)
+- [low] apps/core/tests/test_views.py:15-25 — The `_ElementText` test helper never closes on void tags (`<br>`, `<img>`), so text after one would be collected. The current templates have none. — Skip void tags when tracking depth.
+- [low] tests/test_settings.py:48-60 — The leak regression test checks `isolated_environ` directly rather than the `load_settings` fixture, so removing the `with` block from the fixture wouldn't be caught. — Add a test that asserts a clean `os.environ` after a fixture-based `.env.example` load.
+- Still open from round 1 (security lows, deployment hardening): secure cookie and HTTPS settings, the `.env.example` placeholder key and `DEBUG=true`, `npm ci`, and admin path and throttling. `STATICFILES_DIRS` once `static/` exists.
+
+## Reviewed
+commit 0ce6022, 2026-10-01
