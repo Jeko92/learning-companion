@@ -159,6 +159,7 @@ django==5.2.17 \
     # via
     #   django-stubs
     #   django-stubs-ext
+    #   django-tailwind
     #   learning-companion (pyproject.toml)
 django-environ==0.14.0 \
     --hash=sha256:8dbe8a57f0a540ab8abd6f54f230de5e99e3a2c9d797cb9caecb037bca3d47d8 \
@@ -172,6 +173,10 @@ django-stubs-ext==6.1.1 \
     --hash=sha256:64aebb7ce2c327a4a2b75207d67034e879fd7edf027c93487be69da363dc79fa \
     --hash=sha256:c35263135558d4c5d12b69e1f4c98632bf59bc3ab5118f7d4882d12800e3a7dd
     # via django-stubs
+django-tailwind==4.2.0 \
+    --hash=sha256:60bae45a9981bdf3ebaaa4a8e588533327c90e5857a64f57c26a39b7f234ac0e \
+    --hash=sha256:ff40ccb263faefac555fbaa340d6014f2b07fee6be2c8d5659f2cd63dbce02e9
+    # via learning-companion (pyproject.toml)
 djlint==1.46.4 \
     --hash=sha256:01431f8a04bd1d3f8143c12d32983b429137a39abf61b2146b4040ec5a67c844 \
     --hash=sha256:020e3b5299556cf9651690e6a8e1b52afb9064d74ae198fc0c69a48097d0d01c \
@@ -514,6 +519,7 @@ pytest==9.1.1 \
     #   learning-companion (pyproject.toml)
     #   pytest-cov
     #   pytest-django
+    #   pytest-env
 pytest-cov==7.1.0 \
     --hash=sha256:30674f2b5f6351aa09702a9c8c364f6a01c27aae0c1366ae8016160d1efc56b2 \
     --hash=sha256:a0461110b7865f9a271aa1b51e516c9a95de9d696734a2f71e3e78f46e1d4678
@@ -522,10 +528,18 @@ pytest-django==4.14.0 \
     --hash=sha256:26787dd3f422cfbab8f55b80a776e2edea7a11092cb74e960bef1312515708ef \
     --hash=sha256:c533b08d89cc675efcd5398eea270b34547e35f9a3608e2c9748dd88428ea187
     # via learning-companion (pyproject.toml)
+pytest-env==1.7.1 \
+    --hash=sha256:22341b945305b65ef4e53d7c678982cfd64b5c5800afdf7d37caad2362ea002c \
+    --hash=sha256:f2c5aed2621dbfc73c2866a710e2e456409495c5ac10905612c9509b3ee631a2
+    # via learning-companion (pyproject.toml)
 python-discovery==1.6.1 \
     --hash=sha256:cf87d3627dfb4412437fdd5b13eae402607722998d21567993aedbc59b23c15e \
     --hash=sha256:d43fcdef879fe795352bd13ccf8d185ba5a9f86f36cfcd00529f596e737442b3
     # via virtualenv
+python-dotenv==1.2.4 \
+    --hash=sha256:42269a8a5b3fd54ffa6f3d84b18abed50064717576b4ecf03dc4a55d8aa04fdc \
+    --hash=sha256:f0d53e69935a851c0dcc78f3ab7aaccd8cabef0b92382b576b824212902873c0
+    # via pytest-env
 pyyaml==6.0.3 \
     --hash=sha256:00c4bdeba853cc34e7dd471f16b4114f4162dc03e6b7afcc2128711f0eca823c \
     --hash=sha256:0150219816b6a1fa26fb4699fb7daa9caf09eb1999f3b70fb6e786805e80375a \
