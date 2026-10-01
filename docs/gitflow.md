@@ -3,7 +3,7 @@
 Branching and merging rules for this project. Two long-lived branches, short-lived ticket branches that are kept forever, squash merges at both levels.
 
 ```
-main       ◄── squash-merged PR from develop only ("chore(release): ...")
+main       ◄── squash-merged PR from develop only ("chore: release <date>")
   │  ▲
   │  └── release PR (squash)
   ▼  │
@@ -18,8 +18,8 @@ feat/<id> | fix/<id>   every TDD commit lives here; never deleted, never force-p
 
 | Branch      | Purpose                               | Created from     | Receives changes via                                 | Deleted |
 |-------------|---------------------------------------|------------------|------------------------------------------------------|---------|
-| `main`      | Released state                        | —                | PR from `develop` only, **squash**                   | never   |
-| `develop`   | Integration branch, default branch    | `main` (once)    | PR from `feat/*` / `fix/*`, **squash**; back-sync PR from `main`, **merge commit** | never   |
+| `main`      | Released state, default branch        | —                | PR from `develop` only, **squash**                   | never   |
+| `develop`   | Integration branch                    | `main` (once)    | PR from `feat/*` / `fix/*`, **squash**; back-sync PR from `main`, **merge commit** | never   |
 | `feat/<id>` | New behaviour for ticket `<id>`        | latest `develop` | direct commits (one per green TDD cycle)             | only with explicit permission |
 | `fix/<id>`  | Bug fix for ticket `<id>`              | latest `develop` | direct commits (one per green TDD cycle)             | only with explicit permission |
 
@@ -72,21 +72,23 @@ After step 4 the ticket branch stays on the remote and locally, with every indiv
 ```bash
 # 1. Release PR, squash-merged
 gh pr create --base main --head develop \
-  --title "chore(release): <version or date>" \
+  --title "chore: release <YYYY-MM-DD>" \
   --body "<list of ticket PRs since the last release>"
 gh pr merge <pr-number> --squash
 
 # 2. Immediately back-sync main into develop — MERGE COMMIT, never squash
 gh pr create --base develop --head main \
-  --title "chore: sync main into develop after <version or date>" \
+  --title "chore: sync main into develop after release <YYYY-MM-DD>" \
   --body "Back-sync after release; makes the release squash commit an ancestor of develop."
-gh pr merge <pr-number> --merge
+gh pr merge <pr-number> --merge --subject "chore: sync main into develop after release <YYYY-MM-DD>"
 
 # 3. Optional: tag the release on main
 git fetch origin
 git tag -a v<x.y.z> origin/main -m "<version>"
 git push origin v<x.y.z>
 ```
+
+Every commit that lands on `develop` or `main` must be a Conventional Commit per `.conventionalcommit.json`. Squash commits take the PR title. GitHub's default merge-commit subject ("Merge pull request #n from …") is not conventional, so the back-sync is merged with `--subject` set to the PR title. Because `main` is the default branch, `Closes #<issue>` goes in the release PR body; on a ticket PR into `develop` it would never fire, so ticket PRs use `Refs #<issue>`.
 
 The back-sync changes no files (the release commit's tree already equals `develop`), it only joins the histories. Do it before the next ticket PR lands in `develop`.
 
@@ -107,15 +109,15 @@ Local discipline is not enough; GitHub enforces the rules via repository setting
 
 | Setting                         | Value                                                      |
 |---------------------------------|------------------------------------------------------------|
-| Default branch                  | `develop` (PRs target it unless told otherwise)            |
+| Default branch                  | `main` (ticket PRs still target `develop`: always pass `--base develop`) |
 | Allowed merge methods (repo)    | squash, merge commit; rebase off                           |
 | Automatically delete head branches | **off**                                                 |
 | Squash commit message           | PR title + PR body                                         |
 
 | Ruleset    | Targets                     | Rules                                                                                     | Bypass        |
 |------------|-----------------------------|-------------------------------------------------------------------------------------------|---------------|
-| `main`     | `main`                      | block deletion, block force-push, require PR (squash only), require check `source-branch` | none          |
-| `develop`  | `develop`                   | block deletion, block force-push, require PR (squash + merge), require check `source-branch` | none       |
+| `main`     | `main`                      | block deletion, block force-push, require PR with 1 approving review (squash only), require check `source-branch` | none          |
+| `develop`  | `develop`                   | block deletion, block force-push, require PR with 1 approving review (squash + merge), require check `source-branch` | none       |
 | `tickets`  | `feat/**`, `fix/**`         | block deletion, block force-push                                                          | repo admins (for approved deletions) |
 
 The `source-branch` check (GitHub Action `.github/workflows/pr-source-branch.yml`) fails a PR whose head is not allowed for its base:
@@ -127,7 +129,7 @@ The `source-branch` check (GitHub Action `.github/workflows/pr-source-branch.yml
 
 GitHub can't restrict the merge method per source branch, so `develop` allows both squash and merge commit. The convention is strict: **ticket PRs squash, the back-sync PR merges**.
 
-Rulesets on **private** repositories require GitHub Pro/Team; on the free plan they only work on public repositories. `required_approving_review_count` is `0` for a solo project — raise it when the team grows.
+Rulesets on **private** repositories require GitHub Pro/Team; on the free plan they only work on public repositories. Every PR into `main` and `develop` needs an approving review from a teammate other than the author, for everyone (no bypass, admins included). Stale approvals are dismissed on push, and the last pusher can't approve. The `source-branch` check only becomes required once `.github/workflows/pr-source-branch.yml` exists; until then, requiring it would block every merge.
 
 ## One-time setup script
 
@@ -208,7 +210,7 @@ ruleset <<'JSON'
     { "type": "deletion" },
     { "type": "non_fast_forward" },
     { "type": "pull_request", "parameters": {
-        "required_approving_review_count": 0,
+        "required_approving_review_count": 1,
         "dismiss_stale_reviews_on_push": false,
         "require_code_owner_review": false,
         "require_last_push_approval": false,
@@ -231,7 +233,7 @@ ruleset <<'JSON'
     { "type": "deletion" },
     { "type": "non_fast_forward" },
     { "type": "pull_request", "parameters": {
-        "required_approving_review_count": 0,
+        "required_approving_review_count": 1,
         "dismiss_stale_reviews_on_push": false,
         "require_code_owner_review": false,
         "require_last_push_approval": false,

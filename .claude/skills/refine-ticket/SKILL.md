@@ -33,7 +33,8 @@ Read `.claude/state/workflow.json` (if it exists). If a ticket is already in pro
 5. Create the branch and record the state:
 
    ```bash
-   git switch -c feat/<id>
+   git switch develop && git pull --ff-only     # ticket branches start from the latest develop
+   git switch -c feat/<id>                      # fix/<id> for a defect (docs/gitflow.md)
    bash .claude/hooks/set-state.sh phase refined ticket <id>
    git add work/<id>/ticket.md && git commit -m "docs(<id>): refined ticket"
    ```
