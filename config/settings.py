@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from pathlib import Path
 
+from django.core.exceptions import ImproperlyConfigured
+
 import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -20,10 +22,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = environ.Env()
 
-# DJANGO_ENV_FILE picks the dotenv file; empty means "read none" (used by tests).
-# Real environment variables always win over values from the file.
-_env_file = os.environ.get("DJANGO_ENV_FILE", str(BASE_DIR / ".env"))
-if _env_file and Path(_env_file).is_file():
+# DJANGO_ENV_FILE picks the dotenv file (relative paths: from BASE_DIR); empty
+# means "read none" (used by tests). An explicitly named file must exist, the
+# default .env is optional. Real environment variables win over the file.
+_explicit_env_file = os.environ.get("DJANGO_ENV_FILE")
+if _explicit_env_file is None:
+    _default_env_file = BASE_DIR / ".env"
+    if _default_env_file.is_file():
+        env.read_env(_default_env_file)
+elif _explicit_env_file:
+    _env_file = BASE_DIR / _explicit_env_file
+    if not _env_file.is_file():
+        msg = f"DJANGO_ENV_FILE points to a missing file: {_env_file}"
+        raise ImproperlyConfigured(msg)
     env.read_env(_env_file)
 
 SECRET_KEY = env.str("SECRET_KEY")

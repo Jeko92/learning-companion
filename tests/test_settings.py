@@ -59,3 +59,18 @@ def test_tailwind_and_theme_app_installed(settings):
     assert "tailwind" in settings.INSTALLED_APPS
     assert "apps.theme" in settings.INSTALLED_APPS
     assert settings.TAILWIND_APP_NAME == "apps.theme"
+
+
+def test_explicit_env_file_that_does_not_exist_fails_fast(load_settings):
+    with pytest.raises(ImproperlyConfigured, match="DJANGO_ENV_FILE"):
+        load_settings(DJANGO_ENV_FILE="does-not-exist.env")
+
+
+def test_relative_env_file_resolves_against_base_dir(
+    load_settings, monkeypatch, tmp_path
+):
+    monkeypatch.chdir(tmp_path)
+
+    settings = load_settings(DJANGO_ENV_FILE=".env.example")
+
+    assert settings.SECRET_KEY == "change-me"  # noqa: S105 - value from .env.example
