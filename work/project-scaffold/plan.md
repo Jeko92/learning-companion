@@ -49,7 +49,7 @@
 - [x] 8. `base.html` loads Tailwind, so the rendered home page links to `/static/css/dist/styles.css`. — test: `apps/core/tests/test_views.py` — impl: `templates/base.html` (`{% load tailwind_tags %}{% tailwind_css %}`) — covers: AC4
 - [x] 9. Built CSS and `node_modules/` are gitignored. — test: `tests/test_repo.py` (`git check-ignore` on `apps/theme/static/css/dist/styles.css` and `apps/theme/static_src/node_modules/x`) — impl: `.gitignore` — covers: AC9
 - [x] 10. Make targets build the CSS. — test: `tests/test_repo.py` (`make -n css` shows `manage.py tailwind install`, and `make -n css-watch` shows `manage.py tailwind start`) — impl: `Makefile` (`css`, `css-watch`), djlint exclude for `node_modules`, run `make css` once and commit `package-lock.json`. Also update CLAUDE.md: the layout is now actual, plus the Node.js requirement and the CSS/dev-server commands. That doc change is reviewed, not tested. — covers: AC10
-- [ ] 11. Verification, no new behaviour: `make check` and `make coverage` (≥ 90 %) pass, and anything they flag is fixed. — covers: AC11
+- [x] 11. Verification, no new behaviour: `make check` and `make coverage` (≥ 90 %) pass, and anything they flag is fixed. — covers: AC11
 
 ## Coverage
 | AC | Step(s) |
