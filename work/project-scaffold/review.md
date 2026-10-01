@@ -1,5 +1,5 @@
 # Review: project-scaffold
-## Verdict: FAIL
+## Verdict: FAIL (round 2)
 
 Reason: AC3 is not actually proven. Its test only checks that the `data-testid="tagline"` attribute exists, so an empty or deleted tagline would still pass (code-reviewer, medium). No high-severity findings. The suite is green (13 passed), lint and mypy are clean, and coverage is 95.6 %.
 
@@ -34,3 +34,28 @@ Security review (0 high, 0 medium):
 
 ## Reviewed
 commit d8bba8c, 2026-10-01
+
+---
+
+# Round 2
+## Verdict: FAIL
+
+Reason: a high-severity test-isolation bug (code-reviewer, reproduced in the main session). The suite is green (15 passed), lint and mypy are clean, and coverage is 90.00 %.
+
+Round 1 findings: steps 12, 13, 15 and 16 are resolved. Step 14 is partly resolved: its new test leaks environment variables (see below), and the default-`.env` branch is still untested.
+
+## Acceptance criteria
+- AC1–AC2, AC4–AC11 — unchanged from round 1 — PASS
+- AC3 — covered by `apps/core/tests/test_views.py::test_home_page_shows_title_and_tagline` (heading text plus a non-empty, one-line tagline; a deliberately emptied tagline makes it fail) — PASS
+
+## Findings
+- [high] tests/test_settings.py:13-26, :69-76 — `env.read_env()` writes `.env.example` values into `os.environ` with setdefault. `monkeypatch.delenv(raising=False)` doesn't record keys that were unset, so `undo()` never removes them. After `test_relative_env_file_resolves_against_base_dir`, `DEBUG=true`, `ALLOWED_HOSTS` and `DATABASE_URL` stay set for the rest of the session (reproduced). — Snapshot and restore `os.environ` in the `load_settings` fixture. → plan step 17
+- [medium] config/settings.py:29-32 — The default-`.env` branch (unset → optional `.env`) is untested, and coverage sits exactly at the 90 % gate. — Extract a pure helper `_env_file_to_read(base_dir, value) -> Path | None` and unit-test every case with `tmp_path`. → plan step 18
+- [low] apps/core/tests/test_views.py:17-20 — The AC3 checks depend on exact markup; adding a Tailwind `class` would break them. — Check the h1 and tagline by element text with an HTML parser. → plan step 19
+- [low] CLAUDE.md settings paragraph — It doesn't mention that relative paths resolve against `BASE_DIR` or that a missing explicit file raises. — Add a sentence. → plan step 20
+- [low] config/settings.py:34 — `~` isn't expanded in `DJANGO_ENV_FILE`. — `expanduser()`. → plan step 18 (covered by the helper's tests)
+
+Security re-review: 0 high, 0 medium, 0 new low. The round-1 security lows remain as recorded follow-ups.
+
+## Reviewed
+commit aa0e545, 2026-10-01
