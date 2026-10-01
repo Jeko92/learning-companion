@@ -6,6 +6,7 @@ import pytest
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 GIT = shutil.which("git") or "git"
+MAKE = shutil.which("make") or "make"
 
 
 @pytest.mark.parametrize(
@@ -26,9 +27,6 @@ def test_build_artifacts_are_gitignored(path):
     )
 
     assert result.returncode == 0, f"{path} is not gitignored"
-
-
-MAKE = shutil.which("make") or "make"
 
 
 @pytest.mark.parametrize(

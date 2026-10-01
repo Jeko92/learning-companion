@@ -1,10 +1,8 @@
 import re
 
-import pytest
 from pytest_django.asserts import assertContains, assertTemplateUsed
 
 
-@pytest.mark.django_db
 def test_home_page_renders_base_and_home_templates(client):
     response = client.get("/")
 
